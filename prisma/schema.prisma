@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Bill {
+  id             String   @id
+  billType       String   @map("bill_type")
+  billNumber     Int      @map("bill_number")
+  billYear       Int      @map("bill_year")
+  titleFi        String   @map("title_fi")
+  titleSv        String?  @map("title_sv")
+  summaryFi      String?  @map("summary_fi")
+  category       String?
+  currentStage   String   @default("submitted") @map("current_stage")
+  stageUpdatedAt DateTime? @map("stage_updated_at")
+  submittedDate  DateTime? @map("submitted_date") @db.Date
+  sponsor        String?
+  urgency        String   @default("normal")
+  keywords       String[]
+  eduskuntaUrl   String?  @map("eduskunta_url")
+  rawXml         String?  @map("raw_xml")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  committees CommitteeAssignment[]
+  experts    ExpertHearing[]
+  votes      Vote[]
+  documents  Document[]
+
+  @@index([currentStage])
+  @@index([billYear])
+  @@index([category])
+  @@index([submittedDate(sort: Desc)])
+  @@map("bills")
+}
+
+model CommitteeAssignment {
+  id              Int      @id @default(autoincrement())
+  billId          String   @map("bill_id")
+  committeeCode   String   @map("committee_code")
+  committeeNameFi String   @map("committee_name_fi")
+  role            String
+  assignedDate    DateTime? @map("assigned_date") @db.Date
+  reportId        String?  @map("report_id")
+  reportDate      DateTime? @map("report_date") @db.Date
+
+  bill Bill @relation(fields: [billId], references: [id])
+
+  @@unique([billId, committeeCode])
+  @@index([billId])
+  @@map("committee_assignments")
+}
+
+model ExpertHearing {
+  id                   Int      @id @default(autoincrement())
+  billId               String   @map("bill_id")
+  committeeCode        String   @map("committee_code")
+  expertName           String   @map("expert_name")
+  expertOrganization   String?  @map("expert_organization")
+  hearingDate          DateTime? @map("hearing_date") @db.Date
+  position             String?
+  summaryFi            String?  @map("summary_fi")
+  documentUrl          String?  @map("document_url")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  bill Bill @relation(fields: [billId], references: [id])
+
+  @@index([billId])
+  @@map("expert_hearings")
+}
+
+model Vote {
+  id           String   @id
+  billId       String?  @map("bill_id")
+  voteDate     DateTime? @map("vote_date")
+  votesFor     Int      @default(0) @map("votes_for")
+  votesAgainst Int      @default(0) @map("votes_against")
+  votesAbsent  Int      @default(0) @map("votes_absent")
+  votesEmpty   Int      @default(0) @map("votes_empty")
+  result       String?
+  sessionId    String?  @map("session_id")
+
+  bill   Bill?    @relation(fields: [billId], references: [id])
+  mpVotes MpVote[]
+
+  @@index([billId])
+  @@map("votes")
+}
+
+model MpVote {
+  id        Int    @id @default(autoincrement())
+  voteId    String @map("vote_id")
+  mpId      String @map("mp_id")
+  mpName    String @map("mp_name")
+  party     String
+  voteValue String @map("vote_value")
+
+  vote Vote @relation(fields: [voteId], references: [id])
+
+  @@unique([voteId, mpId])
+  @@index([voteId])
+  @@index([party])
+  @@map("mp_votes")
+}
+
+model Document {
+  id            String   @id
+  billId        String?  @map("bill_id")
+  docType       String   @map("doc_type")
+  titleFi       String?  @map("title_fi")
+  publishedDate DateTime? @map("published_date") @db.Date
+  eduskuntaUrl  String?  @map("eduskunta_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  bill Bill? @relation(fields: [billId], references: [id])
+
+  @@index([billId])
+  @@map("documents")
+}
+
+model Mp {
+  id           String  @id
+  firstName    String  @map("first_name")
+  lastName     String  @map("last_name")
+  party        String
+  constituency String?
+  photoUrl     String? @map("photo_url")
+  isActive     Boolean @default(true) @map("is_active")
+
+  @@map("mps")
+}
