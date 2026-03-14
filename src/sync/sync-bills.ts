@@ -178,13 +178,23 @@ export async function syncBills(
             });
 
             if (parentExists) {
-              await prisma.committeeAssignment.updateMany({
-                where: { billId: parentBillId, committeeCode },
-                data: {
+              await prisma.committeeAssignment.upsert({
+                where: { billId_committeeCode: { billId: parentBillId, committeeCode } },
+                update: {
                   reportId: tunnus,
                   reportDate: parsed.submittedDate
                     ? new Date(parsed.submittedDate)
                     : undefined,
+                },
+                create: {
+                  billId: parentBillId,
+                  committeeCode,
+                  committeeNameFi: committeeNameFi,
+                  role: "lead",
+                  reportId: tunnus,
+                  reportDate: parsed.submittedDate
+                    ? new Date(parsed.submittedDate)
+                    : null,
                 },
               });
 
