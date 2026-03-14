@@ -45,6 +45,22 @@ function inferUrgency(tunnus: string, keywords: string[]): "high" | "normal" | "
   return "normal";
 }
 
+/**
+ * VaskiData has ~325,000 rows ordered by row-ID (oldest first).
+ * Scanning from page 0 every sync wastes ~2,600 pages of irrelevant
+ * pre-2024 data. These offsets were calibrated against the live table
+ * (March 2026) — each entry is the first page that reliably contains
+ * documents for that parliamentary year, with a 100-page safety buffer.
+ *
+ * Re-calibrate annually: find the row-ID where the new year first appears
+ * and divide by 100 to get the page number.
+ */
+const VASKI_YEAR_START_PAGE: Record<number, number> = {
+  2024: 2500, // row ~256,000 starts 2023 tail; 2024 data from ~265,000
+  2025: 2980, // row ~300,000; 2025 data from ~306,000
+  2026: 3150, // row ~315,000; 2026 data from ~320,000 (estimate)
+};
+
 export interface SyncBillsOptions {
   /** Fetch only documents newer than this timestamp (ISO string) */
   since?: string;
@@ -67,10 +83,11 @@ export async function syncBills(
   if (!prisma) throw new Error("No database connection");
 
   const year = options.year ?? new Date().getFullYear();
-  console.log(`[sync-bills] Syncing bills for year ${year}...`);
+  const startPage = VASKI_YEAR_START_PAGE[year] ?? 0;
+  console.log(`[sync-bills] Syncing bills for year ${year} (starting at page ${startPage})...`);
 
   // Fetch one page at a time to stay within memory
-  let page = 0;
+  let page = startPage;
   let upserted = 0;
   let committeesUpdated = 0;
   let errors = 0;
