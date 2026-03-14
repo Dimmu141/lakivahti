@@ -220,10 +220,20 @@ export async function syncBills(
             });
           }
         } else if (isCommitteeStatement(tunnus)) {
-          // Lausunto — store as document, try to link to bill
-          const parentBillId = parsed.eduskuntaTunnus !== tunnus
+          // Lausunto — store as document. Only link to parent bill if it
+          // already exists in the DB; otherwise store unlinked (billId: null)
+          // to avoid FK constraint violations.
+          const rawParentId = parsed.eduskuntaTunnus !== tunnus
             ? parsed.eduskuntaTunnus
             : null;
+          let parentBillId: string | null = null;
+          if (rawParentId) {
+            const exists = await prisma.bill.findUnique({
+              where: { id: rawParentId },
+              select: { id: true },
+            });
+            parentBillId = exists ? rawParentId : null;
+          }
           await prisma.document.upsert({
             where: { id: tunnus },
             update: {},

@@ -11,7 +11,7 @@ import { syncBills } from "./sync-bills";
 import { syncVotes } from "./sync-votes";
 
 /** Earliest parliamentary year to fetch data for. */
-export const SYNC_START_YEAR = 2023;
+export const SYNC_START_YEAR = 2025;
 
 export interface SyncResult {
   ok: boolean;
