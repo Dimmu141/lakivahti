@@ -4,6 +4,8 @@
  * Runs: MPs → Bills → Votes (in that order so FK constraints are satisfied).
  */
 
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
 import { syncMps } from "./sync-mps";
 import { syncBills } from "./sync-bills";
 import { syncVotes } from "./sync-votes";
@@ -63,4 +65,12 @@ export async function runSync(options: {
     console.error("[sync] Failed:", error);
     return { ok: false, timestamp, years, error };
   }
+}
+
+// Entry point when run directly via `npm run sync`
+if (process.argv[1] && process.argv[1].includes("sync-orchestrator")) {
+  runSync().then((result) => {
+    console.log("[sync] Result:", JSON.stringify(result, null, 2));
+    process.exit(result.ok ? 0 : 1);
+  });
 }
