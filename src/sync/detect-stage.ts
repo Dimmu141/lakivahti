@@ -13,7 +13,7 @@ export function detectStage(bill: BillSnapshot): StageKey {
   if (bill.votes.length > 0) return "voted";
   const lead = bill.committees.find((c) => c.role === "lead");
   if (lead?.reportId) return "report";
-  // "hearing" stage is not yet tracked via sync — skip expert check
+  if (bill.experts.length > 0) return "hearing";
   if (bill.committees.length > 0) return "committee";
   return "submitted";
 }

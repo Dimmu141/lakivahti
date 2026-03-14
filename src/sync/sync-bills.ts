@@ -9,6 +9,7 @@ import { getPrisma } from "../lib/db";
 import { fetchTableRows, VASKI_COL } from "../lib/eduskunta-api";
 import {
   parseVaskiXml,
+  parseExpertsFromXml,
   isPrimaryBillType,
   isCommitteeReport,
   isCommitteeStatement,
@@ -212,6 +213,34 @@ export async function syncBills(
                   eduskuntaUrl: `https://www.eduskunta.fi/FI/vaski/Mietinto/Sivut/${tunnus.replace(" vp", "").replace(/\s+/g, "_")}.aspx`,
                 },
               });
+
+              // Parse and upsert expert hearings from the committee report XML
+              const experts = parseExpertsFromXml(xml);
+              for (const expert of experts) {
+                const expertName = [expert.firstName, expert.lastName]
+                  .filter(Boolean)
+                  .join(" ");
+                if (!expertName) continue;
+                await prisma.expertHearing.upsert({
+                  where: {
+                    billId_expertName_committeeCode: {
+                      billId: parentBillId,
+                      expertName,
+                      committeeCode: committeeCode!,
+                    },
+                  },
+                  update: {},
+                  create: {
+                    billId: parentBillId,
+                    committeeCode: committeeCode!,
+                    expertName,
+                    expertOrganization: expert.organization ?? null,
+                    hearingDate: parsed.submittedDate
+                      ? new Date(parsed.submittedDate)
+                      : null,
+                  },
+                });
+              }
 
               committeesUpdated++;
             }

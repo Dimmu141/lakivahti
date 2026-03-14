@@ -149,6 +149,40 @@ export function parseVaskiXml(xml: string): ParsedVaskiDoc {
   };
 }
 
+// ─── Expert hearing parser ────────────────────────────────────────────────────
+
+export interface ParsedExpert {
+  firstName: string | null;
+  lastName: string | null;
+  /** AsemaTeksti: "johtava asiantuntija", "ylijohtaja", etc. */
+  title: string | null;
+  /** YhteisoTeksti: "sisäministeriö", "Kela", etc. */
+  organization: string | null;
+}
+
+/**
+ * Extract all <vsk:Asiantuntija> blocks from a committee report XML.
+ * Each block contains the name, title and organisation of one heard expert.
+ */
+export function parseExpertsFromXml(xml: string): ParsedExpert[] {
+  const blockRe =
+    /<(?:[^:>\s]+:)?Asiantuntija(?:\s[^>]*)?>[\s\S]*?<\/(?:[^:>\s]+:)?Asiantuntija>/gi;
+  const experts: ParsedExpert[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = blockRe.exec(xml)) !== null) {
+    const block = m[0];
+    const firstName = extractText(block, "EtuNimi");
+    const lastName = extractText(block, "SukuNimi");
+    const title = extractText(block, "AsemaTeksti");
+    const organization = extractText(block, "YhteisoTeksti");
+    // Only add if we have at least a name or organisation
+    if (firstName || lastName || organization) {
+      experts.push({ firstName, lastName, title, organization });
+    }
+  }
+  return experts;
+}
+
 function empty(): ParsedVaskiDoc {
   return {
     eduskuntaTunnus: null,

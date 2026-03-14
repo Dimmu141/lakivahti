@@ -70,6 +70,7 @@ model ExpertHearing {
 
   bill Bill @relation(fields: [billId], references: [id])
 
+  @@unique([billId, expertName, committeeCode])
   @@index([billId])
   @@map("expert_hearings")
 }
