@@ -171,8 +171,13 @@ export async function syncBills(
             : null;
 
           if (parentBillId && committeeCode) {
-            // Update existing assignment if found
-            try {
+            // Only proceed if the parent bill actually exists in the DB
+            const parentExists = await prisma.bill.findUnique({
+              where: { id: parentBillId },
+              select: { id: true },
+            });
+
+            if (parentExists) {
               await prisma.committeeAssignment.updateMany({
                 where: { billId: parentBillId, committeeCode },
                 data: {
@@ -183,7 +188,6 @@ export async function syncBills(
                 },
               });
 
-              // Upsert the report document
               await prisma.document.upsert({
                 where: { id: tunnus },
                 update: {},
@@ -200,8 +204,6 @@ export async function syncBills(
               });
 
               committeesUpdated++;
-            } catch {
-              // Parent bill may not exist yet — skip
             }
           } else if (committeeCode && !parentBillId) {
             // We have a report but can't link it yet — upsert as unlinked document
