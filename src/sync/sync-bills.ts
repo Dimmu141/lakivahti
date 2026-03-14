@@ -270,16 +270,13 @@ export async function syncBills(
     await new Promise((r) => setTimeout(r, 200));
   }
 
-  // After upserting bills, recalculate stages for all bills this year
-  await recalculateStages(year);
-
   console.log(
     `[sync-bills] Done: ${upserted} bills, ${committeesUpdated} committee updates, ${errors} errors`
   );
   return { upserted, committeesUpdated, errors };
 }
 
-async function recalculateStages(year: number) {
+export async function recalculateStages(year: number) {
   const prisma = getPrisma();
   if (!prisma) return;
   const bills = await prisma.bill.findMany({

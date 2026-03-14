@@ -7,7 +7,7 @@
 import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 import { syncMps } from "./sync-mps";
-import { syncBills } from "./sync-bills";
+import { syncBills, recalculateStages } from "./sync-bills";
 import { syncVotes } from "./sync-votes";
 
 /** Earliest parliamentary year to fetch data for. */
@@ -56,6 +56,13 @@ export async function runSync(options: {
       totalVotes.upserted += v.upserted;
       totalVotes.mpVotes += v.mpVotes;
       totalVotes.errors += v.errors;
+    }
+
+    // Recalculate stages AFTER all votes are synced so vote-linked stages
+    // (voted, enacted) are correctly detected.
+    console.log("[sync] Recalculating stages...");
+    for (const year of years) {
+      await recalculateStages(year);
     }
 
     console.log("[sync] Complete.");
