@@ -8,10 +8,13 @@ import { syncMps } from "./sync-mps";
 import { syncBills } from "./sync-bills";
 import { syncVotes } from "./sync-votes";
 
+/** Earliest parliamentary year to fetch data for. */
+export const SYNC_START_YEAR = 2023;
+
 export interface SyncResult {
   ok: boolean;
   timestamp: string;
-  year: number;
+  years: number[];
   mps?: { upserted: number; errors: number };
   bills?: { upserted: number; committeesUpdated: number; errors: number };
   votes?: { upserted: number; mpVotes: number; errors: number };
@@ -19,24 +22,45 @@ export interface SyncResult {
 }
 
 export async function runSync(options: {
+  /** Sync a single year only. Defaults to all years from SYNC_START_YEAR to current. */
   year?: number;
   skipMps?: boolean;
   incremental?: boolean;
 } = {}): Promise<SyncResult> {
-  const year = options.year ?? new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
+  const years = options.year
+    ? [options.year]
+    : Array.from(
+        { length: currentYear - SYNC_START_YEAR + 1 },
+        (_, i) => SYNC_START_YEAR + i
+      );
+
   const timestamp = new Date().toISOString();
-  console.log(`[sync] Starting sync for year ${year}...`);
+  console.log(`[sync] Starting sync for years ${years.join(", ")}...`);
 
   try {
     const mps = options.skipMps ? undefined : await syncMps();
-    const bills = await syncBills({ year });
-    const votes = await syncVotes({ year, incremental: options.incremental });
+
+    let totalBills = { upserted: 0, committeesUpdated: 0, errors: 0 };
+    let totalVotes = { upserted: 0, mpVotes: 0, errors: 0 };
+
+    for (const year of years) {
+      const b = await syncBills({ year });
+      totalBills.upserted += b.upserted;
+      totalBills.committeesUpdated += b.committeesUpdated;
+      totalBills.errors += b.errors;
+
+      const v = await syncVotes({ year, incremental: options.incremental });
+      totalVotes.upserted += v.upserted;
+      totalVotes.mpVotes += v.mpVotes;
+      totalVotes.errors += v.errors;
+    }
 
     console.log("[sync] Complete.");
-    return { ok: true, timestamp, year, mps, bills, votes };
+    return { ok: true, timestamp, years, mps, bills: totalBills, votes: totalVotes };
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e);
     console.error("[sync] Failed:", error);
-    return { ok: false, timestamp, year, error };
+    return { ok: false, timestamp, years, error };
   }
 }

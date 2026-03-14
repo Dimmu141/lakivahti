@@ -86,7 +86,8 @@ async function run() {
   console.log(`[initial-load] Loaded ${mpRows.length} MPs`);
 
   // ── Bills from VaskiData ───────────────────────────────────────────────────
-  console.log("[initial-load] Loading bills from VaskiData...");
+  const START_YEAR = 2023;
+  console.log(`[initial-load] Loading bills from VaskiData (${START_YEAR}→)...`);
   const vaskiRows = db
     .prepare(
       "SELECT Id, XmlData, Created, Eduskuntatunnus FROM VaskiData WHERE Eduskuntatunnus IS NOT NULL"
@@ -104,6 +105,7 @@ async function run() {
 
     const billNumber = parsed.billNumber ?? 0;
     const billYear = parsed.billYear ?? parseInt(tunnus.match(/\/(\d{4})\s/)?.[1] ?? "0", 10);
+    if (billYear < START_YEAR) continue;
     const titleFi = parsed.titleFi ?? tunnus;
     const submittedDate = parsed.submittedDate ? new Date(parsed.submittedDate) : null;
 
@@ -145,13 +147,13 @@ async function run() {
   console.log(`[initial-load] Loaded ${billCount} bills`);
 
   // ── Votes ──────────────────────────────────────────────────────────────────
-  console.log("[initial-load] Loading votes...");
+  console.log(`[initial-load] Loading votes (${START_YEAR}→)...`);
   const voteRows = db
     .prepare(
       `SELECT AanestysId, IstuntoPvm, AanestysAlkuaika,
               AanestysTulosJaa, AanestysTulosEi, AanestysTulosTyhjia, AanestysTulosPoissa,
               AanestysValtiopaivaasia
-       FROM SaliDBAanestys WHERE AanestysId IS NOT NULL`
+       FROM SaliDBAanestys WHERE AanestysId IS NOT NULL AND IstuntoPvm >= '${START_YEAR}-01-01'`
     )
     .all() as {
       AanestysId: string;
@@ -193,12 +195,14 @@ async function run() {
   console.log(`[initial-load] Loaded ${voteCount} votes`);
 
   // ── MP votes ───────────────────────────────────────────────────────────────
-  console.log("[initial-load] Loading MP votes...");
+  console.log(`[initial-load] Loading MP votes (${START_YEAR}→)...`);
   const mpVoteRows = db
     .prepare(
-      `SELECT AanestysId, EdustajaHenkiloNumero, EdustajaEtunimi, EdustajaSukunimi,
-              EdustajaRyhmaLyhenne, EdustajaAanestys
-       FROM SaliDBAanestysEdustaja WHERE AanestysId IS NOT NULL`
+      `SELECT e.AanestysId, e.EdustajaHenkiloNumero, e.EdustajaEtunimi, e.EdustajaSukunimi,
+              e.EdustajaRyhmaLyhenne, e.EdustajaAanestys
+       FROM SaliDBAanestysEdustaja e
+       INNER JOIN SaliDBAanestys a ON a.AanestysId = e.AanestysId
+       WHERE e.AanestysId IS NOT NULL AND a.IstuntoPvm >= '${START_YEAR}-01-01'`
     )
     .all() as {
       AanestysId: string;
