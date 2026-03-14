@@ -19,10 +19,19 @@ function createClient(): PrismaClient | null {
 }
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | null;
+  prisma: PrismaClient | null | undefined;
 };
 
-export const prisma: PrismaClient | null =
-  globalForPrisma.prisma ?? createClient();
+// Lazy getter — evaluated on first access, after dotenv has run
+export function getPrisma(): PrismaClient | null {
+  if (globalForPrisma.prisma === undefined) {
+    globalForPrisma.prisma = createClient();
+  }
+  return globalForPrisma.prisma;
+}
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+/** @deprecated Use getPrisma() in sync scripts. For Next.js server components this still works because Next sets env at startup. */
+export const prisma: PrismaClient | null =
+  typeof globalForPrisma.prisma !== "undefined"
+    ? globalForPrisma.prisma
+    : createClient();

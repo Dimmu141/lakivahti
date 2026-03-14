@@ -6,7 +6,7 @@
  * Eduskuntatunnus (e.g. "HE 1/2026 vp").
  */
 
-import { prisma } from "../lib/db";
+import { getPrisma } from "../lib/db";
 import {
   fetchTableRows,
   fetchAllRows,
@@ -48,6 +48,7 @@ export interface SyncVotesOptions {
 export async function syncVotes(
   options: SyncVotesOptions = {}
 ): Promise<{ upserted: number; mpVotes: number; errors: number }> {
+  const prisma = getPrisma();
   if (!prisma) throw new Error("No database connection");
 
   const year = options.year ?? new Date().getFullYear();

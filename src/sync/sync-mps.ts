@@ -2,10 +2,11 @@
  * Sync MemberOfParliament table → mps DB table.
  */
 
-import { prisma } from "../lib/db";
+import { getPrisma } from "../lib/db";
 import { fetchAllRows, MP_COL } from "../lib/eduskunta-api";
 
 export async function syncMps(): Promise<{ upserted: number; errors: number }> {
+  const prisma = getPrisma();
   if (!prisma) throw new Error("No database connection");
 
   console.log("[sync-mps] Fetching MemberOfParliament...");

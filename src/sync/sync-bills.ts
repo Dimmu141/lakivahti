@@ -5,7 +5,7 @@
  * Committee reports (HaVM, PuVM, etc.) are processed to update committee_assignments.
  */
 
-import { prisma } from "../lib/db";
+import { getPrisma } from "../lib/db";
 import { fetchTableRows, VASKI_COL } from "../lib/eduskunta-api";
 import {
   parseVaskiXml,
@@ -62,6 +62,7 @@ export interface SyncBillsResult {
 export async function syncBills(
   options: SyncBillsOptions = {}
 ): Promise<SyncBillsResult> {
+  const prisma = getPrisma();
   if (!prisma) throw new Error("No database connection");
 
   const year = options.year ?? new Date().getFullYear();
@@ -257,6 +258,7 @@ export async function syncBills(
 }
 
 async function recalculateStages(year: number) {
+  const prisma = getPrisma();
   if (!prisma) return;
   const bills = await prisma.bill.findMany({
     where: { billYear: year },
