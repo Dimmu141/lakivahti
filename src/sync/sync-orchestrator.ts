@@ -58,12 +58,10 @@ export async function runSync(options: {
       totalVotes.errors += v.errors;
     }
 
-    // Recalculate stages AFTER all votes are synced so vote-linked stages
-    // (voted, enacted) are correctly detected.
+    // Recalculate stages for ALL bills (not per-year) because committee
+    // reports from later years reference parent bills from earlier years.
     console.log("[sync] Recalculating stages...");
-    for (const year of years) {
-      await recalculateStages(year);
-    }
+    await recalculateStages();
 
     console.log("[sync] Complete.");
     return { ok: true, timestamp, years, mps, bills: totalBills, votes: totalVotes };

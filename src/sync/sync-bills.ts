@@ -322,11 +322,13 @@ export async function syncBills(
   return { upserted, committeesUpdated, errors };
 }
 
-export async function recalculateStages(year: number) {
+export async function recalculateStages() {
   const prisma = getPrisma();
   if (!prisma) return;
+
+  // Recalculate ALL bills — committee reports from later years often
+  // reference parent bills from earlier years (e.g. 2025 report → 2023 bill).
   const bills = await prisma.bill.findMany({
-    where: { billYear: year },
     include: {
       documents: { select: { docType: true } },
       votes: { select: { id: true } },
@@ -335,6 +337,7 @@ export async function recalculateStages(year: number) {
     },
   });
 
+  let updated = 0;
   for (const bill of bills) {
     const stage = detectStage(bill);
     if (stage !== bill.currentStage) {
@@ -342,6 +345,8 @@ export async function recalculateStages(year: number) {
         where: { id: bill.id },
         data: { currentStage: stage, stageUpdatedAt: new Date() },
       });
+      updated++;
     }
   }
+  console.log(`[sync] Recalculated stages: ${updated} bills updated out of ${bills.length}`);
 }
