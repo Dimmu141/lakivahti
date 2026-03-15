@@ -104,7 +104,7 @@ export async function getBills(query: BillsQuery = {}): Promise<BillsResult> {
       prisma.bill.findMany({
         where,
         include: { committees: true },
-        orderBy: { stageUpdatedAt: "desc" },
+        orderBy: [{ submittedDate: "desc" }, { id: "desc" }],
         skip: (page - 1) * limit,
         take: limit,
       }),
