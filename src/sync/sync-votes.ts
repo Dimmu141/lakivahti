@@ -135,11 +135,10 @@ export async function syncVotes(
       });
       upserted++;
 
-      // Fetch individual MP votes for this vote
-      const mpRows = await fetchTableRows("SaliDBAanestysEdustaja", {
+      // Fetch individual MP votes for this vote (all 200 MPs)
+      const mpRows = await fetchAllRows("SaliDBAanestysEdustaja", {
         columnName: "AanestysId",
         columnValue: aanestysId,
-        perPage: 100,
       });
 
       for (const mpRow of mpRows) {

@@ -266,29 +266,27 @@ export default function BillDetail({ bill }: { bill: SampleBill }) {
               </div>
             ) : (
               <>
-                <div
-                  className="flex items-center justify-between mb-3"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  <span className="text-xs uppercase tracking-wider">
+                <div className="mb-3">
+                  <span className="text-xs uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
                     {bill.experts.length} asiantuntijaa kuultu
                   </span>
-                  <div className="flex gap-3 text-xs">
-                    <span style={{ color: "var(--accent-green)" }}>
-                      ● Puolesta {bill.experts.filter((e) => e.position === "for").length}
-                    </span>
-                    <span style={{ color: "var(--accent-red)" }}>
-                      ● Vastaan {bill.experts.filter((e) => e.position === "against").length}
-                    </span>
-                    <span style={{ color: "var(--accent-yellow)" }}>
-                      ● Neutraali {bill.experts.filter((e) => e.position === "neutral").length}
-                    </span>
-                  </div>
                 </div>
                 <div className="space-y-2">
-                  {bill.experts.map((expert) => (
-                    <ExpertCard key={expert.id} expert={expert} />
-                  ))}
+                  {bill.experts.map((expert) => {
+                    const committee = bill.committees.find(
+                      (c) => c.committeeCode === expert.committeeCode
+                    );
+                    const reportDoc = committee?.reportId
+                      ? bill.documents.find((d) => d.id === committee.reportId)
+                      : null;
+                    return (
+                      <ExpertCard
+                        key={expert.id}
+                        expert={expert}
+                        reportUrl={reportDoc?.eduskuntaUrl ?? null}
+                      />
+                    );
+                  })}
                 </div>
               </>
             )}

@@ -52,8 +52,7 @@ function dbToSampleBill(bill: any): SampleBill {
       expertName: e.expertName,
       expertOrganization: e.expertOrganization ?? null,
       hearingDate: e.hearingDate?.toISOString().split("T")[0] ?? null,
-      position: (e.position ?? null) as "for" | "against" | "neutral" | null,
-      summaryFi: e.summaryFi ?? null,
+      committeeCode: e.committeeCode ?? null,
     })),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     votes: (bill.votes ?? []).map((v: any) => ({

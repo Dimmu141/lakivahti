@@ -3,8 +3,7 @@ export interface SampleExpert {
   expertName: string;
   expertOrganization: string | null;
   hearingDate: string | null;
-  position: "for" | "against" | "neutral" | null;
-  summaryFi: string | null;
+  committeeCode: string | null;
 }
 
 export interface SampleCommittee {
@@ -100,24 +99,21 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertName: "Kenraaliluutnantti Pekka Toveri",
         expertOrganization: "Puolustusvoimat",
         hearingDate: "2026-02-05",
-        position: "for",
-        summaryFi: "Esitys on puolustuskyvyn kannalta perusteltu ja tarpeellinen.",
+        committeeCode: "PuV",
       },
       {
         id: 2,
         expertName: "Prof. Matti Virtanen",
         expertOrganization: "Maanpuolustuskorkeakoulu",
         hearingDate: "2026-02-05",
-        position: "for",
-        summaryFi: "Kertausharjoitusten pidentäminen on perusteltua nykyisessä turvallisuustilanteessa.",
+        committeeCode: "PuV",
       },
       {
         id: 3,
         expertName: "Anna Korhonen",
         expertOrganization: "Suomen Sadankomitea",
         hearingDate: "2026-02-07",
-        position: "against",
-        summaryFi: "Muutokset kuormittavat kohtuuttomasti reserviläisiä ja heidän perheitään.",
+        committeeCode: "PuV",
       },
     ],
     votes: [
@@ -189,16 +185,14 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertName: "Ylijohtaja Kirsi Varhila",
         expertOrganization: "STM",
         hearingDate: "2026-02-10",
-        position: "for",
-        summaryFi: "Uudistus on välttämätön hoitojonojen purkamiseksi.",
+        committeeCode: "StV",
       },
       {
         id: 5,
         expertName: "Prof. Marja-Liisa Manka",
         expertOrganization: "Tampereen yliopisto",
         hearingDate: "2026-02-10",
-        position: "neutral",
-        summaryFi: "Esitys on askel oikeaan suuntaan, mutta rahoitusmalli kaipaa täsmennystä.",
+        committeeCode: "StV",
       },
     ],
     votes: [],
@@ -250,16 +244,14 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertName: "Johtava veroasiantuntija Tero Honkanen",
         expertOrganization: "Verohallinto",
         hearingDate: "2026-03-05",
-        position: "neutral",
-        summaryFi: "Teknisesti toteuttamiskelpoinen, vaikutukset maltilliset.",
+        committeeCode: "VaV",
       },
       {
         id: 7,
         expertName: "Toimitusjohtaja Leena Mäkinen",
         expertOrganization: "Kotityöpalveluyhdistys",
         hearingDate: "2026-03-05",
-        position: "for",
-        summaryFi: "Korotus tukee harmaan talouden torjuntaa ja työllisyyttä.",
+        committeeCode: "VaV",
       },
     ],
     votes: [],
@@ -370,8 +362,7 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertName: "Ylijohtaja Matti Kauppinen",
         expertOrganization: "Ympäristöministeriö",
         hearingDate: "2025-10-15",
-        position: "for",
-        summaryFi: "Lupamenettelyjen digitalisaatio on välttämätöntä.",
+        committeeCode: "YmV",
       },
     ],
     votes: [
