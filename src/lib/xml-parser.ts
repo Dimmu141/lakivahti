@@ -149,6 +149,93 @@ export function parseVaskiXml(xml: string): ParsedVaskiDoc {
   };
 }
 
+// ─── Processing stage parser ─────────────────────────────────────────────────
+
+/**
+ * Stage codes found in <vsk:YleinenKasittelyvaihe vsk1:yleinenKasittelyvaiheKoodi="...">.
+ * The last code in document order is the current/highest stage reached.
+ *
+ *  VIR      = vireilletulo (submitted)
+ *  ILM      = ilmoitettu täysistunnossa
+ *  LK       = lähetekeskustelu (referral debate)
+ *  VIRVK    = vireilletulo valiokunnassa  → committee
+ *  KASVK    = käsittely valiokunnassa     → hearing
+ *  VKPLM    = valiokunnan mietintö        → report
+ *  VKPP     = mietintö pöydälle           → plenary
+ *  1K       = ensimmäinen käsittely       → plenary
+ *  2K       = toinen käsittely            → plenary
+ *  EVEK     = eduskunnan vastaus          → voted
+ *  TOIMEVEK = vastauksen toimittaminen    → enacted
+ */
+export const STAGE_CODE_ORDER = [
+  "VIR", "ILM", "LK",
+  "VIRVK", "KASVK",
+  "VKPLM", "VKPP",
+  "1K", "2K",
+  "EVEK", "TOIMEVEK",
+] as const;
+
+export interface ParsedProcessingStage {
+  /** The highest (latest) yleinenKasittelyvaiheKoodi found, or null. */
+  latestStageCode: string | null;
+  /** All stage codes in document order. */
+  allStageCodes: string[];
+  /**
+   * Committee codes extracted from fra1:fraasiMuuTunnus attributes.
+   * Short-pattern only (e.g. "tav01" → "TaV"). UUID values are skipped.
+   * First entry is treated as lead committee.
+   */
+  referredCommittees: string[];
+}
+
+/** fraasiMuuTunnus "tav01" → "TaV", "hav02" → "HaV", etc. */
+function muuTunnusToCommitteeCode(t: string): string | null {
+  const m = t.match(/^([a-z]+)\d+$/);
+  if (!m) return null; // UUID or other non-short form
+  const base = m[1];
+  const MAP: Record<string, string> = {
+    pev: "PeV", lav: "LaV", hav: "HaV", tav: "TaV",
+    vav: "VaV", puv: "PuV", uav: "UaV", siv: "SiV",
+    stv: "StV", tyv: "TyV", liv: "LiV", mmv: "MmV",
+    ymv: "YmV", suv: "SuV", trv: "TrV", tuv: "TuV",
+  };
+  return MAP[base] ?? null;
+}
+
+/**
+ * Parse processing stage codes and committee referrals from a
+ * KasittelytiedotValtiopaivaasia document (or any VaskiData XML that
+ * contains these elements).
+ */
+export function parseProcessingStages(xml: string): ParsedProcessingStage {
+  // Extract all yleinenKasittelyvaiheKoodi values in document order
+  const stageRe = /yleinenKasittelyvaiheKoodi="([^"]+)"/gi;
+  const allStageCodes: string[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = stageRe.exec(xml)) !== null) {
+    allStageCodes.push(m[1]);
+  }
+
+  // Latest (highest) stage = last entry in document order
+  const latestStageCode = allStageCodes.length > 0
+    ? allStageCodes[allStageCodes.length - 1]
+    : null;
+
+  // Extract committee codes from fraasiMuuTunnus="tav01" etc.
+  const committeeRe = /fraasiMuuTunnus="([^"]+)"/gi;
+  const seen = new Set<string>();
+  const referredCommittees: string[] = [];
+  while ((m = committeeRe.exec(xml)) !== null) {
+    const code = muuTunnusToCommitteeCode(m[1]);
+    if (code && !seen.has(code)) {
+      seen.add(code);
+      referredCommittees.push(code);
+    }
+  }
+
+  return { latestStageCode, allStageCodes, referredCommittees };
+}
+
 // ─── Expert hearing parser ────────────────────────────────────────────────────
 
 export interface ParsedExpert {

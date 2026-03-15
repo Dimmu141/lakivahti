@@ -30,6 +30,20 @@ function normaliseParty(raw: string): string {
   return map[raw.toLowerCase()] ?? raw.toUpperCase();
 }
 
+/**
+ * Skip Swedish-language duplicate vote rows (suffix " rd").
+ * The API generates one Finnish ("vp") and one Swedish ("rd") row per vote
+ * event. They have different AanestysId values so both get inserted as
+ * separate votes. We only want the Finnish rows.
+ * Returns null if the row should be skipped.
+ */
+function normalizeBillRef(raw: string | null): string | null {
+  if (!raw) return null;
+  const t = raw.trim();
+  if (t.endsWith(" rd")) return null; // Swedish duplicate — skip
+  return t;
+}
+
 function parseVoteValue(raw: string): string {
   // API values: "Jaa", "Ei", "Poissa", "Tyhjää"
   const v = raw.trim();
@@ -69,13 +83,17 @@ export async function syncVotes(
     const aanestysId = row[AANESTYS_COL.AanestysId];
     if (!aanestysId) continue;
 
+    // Skip Swedish-language duplicate rows (" rd" suffix)
+    const rawBillRef = row[AANESTYS_COL.AanestysValtiopaivaasia] ?? null;
+    if (rawBillRef?.trim().endsWith(" rd")) continue;
+
     // Skip if incremental and vote already exists
     if (options.incremental) {
       const existing = await prisma.vote.findUnique({ where: { id: aanestysId } });
       if (existing) continue;
     }
 
-    const billId = row[AANESTYS_COL.AanestysValtiopaivaasia]?.trim() || null;
+    const billId = normalizeBillRef(rawBillRef);
     const voteDateRaw = row[AANESTYS_COL.AanestysAlkuaika] || row[AANESTYS_COL.IstuntoPvm];
     const voteDate = voteDateRaw ? new Date(voteDateRaw) : null;
 

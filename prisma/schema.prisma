@@ -22,8 +22,9 @@ model Bill {
   sponsor        String?
   urgency        String   @default("normal")
   keywords       String[]
-  eduskuntaUrl   String?  @map("eduskunta_url")
-  rawXml         String?  @map("raw_xml")
+  eduskuntaUrl        String?  @map("eduskunta_url")
+  processingStageCode String?  @map("processing_stage_code")
+  rawXml              String?  @map("raw_xml")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 

@@ -10,6 +10,7 @@ import { fetchTableRows, VASKI_COL } from "../lib/eduskunta-api";
 import {
   parseVaskiXml,
   parseExpertsFromXml,
+  parseProcessingStages,
   isPrimaryBillType,
   isCommitteeReport,
   isCommitteeStatement,
@@ -172,6 +173,47 @@ export async function syncBills(
             },
           });
 
+          // ── Extract processing stages + committee referrals ─────────────────
+          // The KasittelytiedotValtiopaivaasia row (same tunnus, processed
+          // separately) carries yleinenKasittelyvaiheKoodi attributes and
+          // fra1:fraasiMuuTunnus committee codes. We parse them here for BOTH
+          // the GovernmentProposal and the processing-info rows, so whichever
+          // is processed last wins via update.
+          const stages = parseProcessingStages(xml);
+          if (stages.latestStageCode) {
+            await prisma.bill.update({
+              where: { id: tunnus },
+              data: { processingStageCode: stages.latestStageCode },
+            });
+          }
+
+          // Create committee assignments from referral data (role "lead" for
+          // the first committee, "statement" for any subsequent ones).
+          // Only create records that don't already exist (a committee report
+          // sync may have already created a richer record with reportId).
+          for (let i = 0; i < stages.referredCommittees.length; i++) {
+            const committeeCode = stages.referredCommittees[i];
+            const role = i === 0 ? "lead" : "statement";
+            const committeeNameFi = COMMITTEES[committeeCode] ?? committeeCode;
+            const existing = await prisma.committeeAssignment.findUnique({
+              where: { billId_committeeCode: { billId: tunnus, committeeCode } },
+            });
+            if (!existing) {
+              await prisma.committeeAssignment.create({
+                data: {
+                  billId: tunnus,
+                  committeeCode,
+                  committeeNameFi,
+                  role,
+                  assignedDate: submittedDate,
+                  reportId: null,
+                  reportDate: null,
+                },
+              });
+              committeesUpdated++;
+            }
+          }
+
           upserted++;
         } else if (isCommitteeReport(tunnus)) {
           // ── Committee report: update committee_assignments ────────────────
@@ -329,7 +371,10 @@ export async function recalculateStages() {
   // Recalculate ALL bills — committee reports from later years often
   // reference parent bills from earlier years (e.g. 2025 report → 2023 bill).
   const bills = await prisma.bill.findMany({
-    include: {
+    select: {
+      id: true,
+      currentStage: true,
+      processingStageCode: true,
       documents: { select: { docType: true } },
       votes: { select: { id: true } },
       committees: { select: { role: true, reportId: true } },
