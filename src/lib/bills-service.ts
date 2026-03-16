@@ -230,21 +230,16 @@ export async function getMpWithVotes(mpId: string) {
 export async function getBillsByCommittee(committeeCode: string): Promise<SampleBill[]> {
   try {
     if (!prisma) throw new Error("no db");
-    const assignments = await prisma.committeeAssignment.findMany({
-      where: { committeeCode },
-      include: {
-        bill: {
-          include: {
-            committees: true,
-            experts: true,
-            votes: true,
-            documents: true,
-          },
-        },
+    const bills = await prisma.bill.findMany({
+      where: {
+        committees: { some: { committeeCode } },
       },
-      orderBy: [{ bill: { submittedDate: "desc" } }],
+      include: { committees: true },
+      orderBy: [{ submittedDate: "desc" }],
+      take: 80,
     });
-    return assignments.map((a) => dbToSampleBill(a.bill));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return bills.map((b: any) => dbToSampleBill({ ...b, experts: [], votes: [] }));
   } catch {
     return [];
   }
@@ -271,7 +266,7 @@ export async function getMps() {
   try {
     if (!prisma) throw new Error("no db");
     return await prisma.mp.findMany({
-      where: { isActive: true },
+      where: { isActive: true, party: { not: "" } },
       orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
     });
   } catch {

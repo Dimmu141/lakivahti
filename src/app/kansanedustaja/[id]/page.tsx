@@ -7,6 +7,23 @@ import { billIdToSlug, formatFinnishDate } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
+const PARTY_GROUP_MAP: Record<string, string> = {
+  "Parliamentary Group of the National Coalition Party": "KOK",
+  "The Finns Party Parliamentary Group": "PS",
+  "Social Democratic Parliamentary Group": "SDP",
+  "Centre Party Parliamentary Group": "KESK",
+  "Green Parliamentary Group": "VIHR",
+  "Left Alliance Parliamentary Group": "VAS",
+  "Swedish Parliamentary Group": "RKP",
+  "Christian Democratic Parliamentary Group": "KD",
+  "Liike Nyt-Movement's Parliamentary Group": "LIIK",
+  "Parliamentary Group Timo Vornanen": "PS",
+};
+function normalizePartyAbbrev(raw: string): string {
+  const t = raw.trim();
+  return PARTY_GROUP_MAP[t] ?? t;
+}
+
 interface Props {
   params: Promise<{ id: string }>;
 }
@@ -33,7 +50,7 @@ export default async function KansanedustajaPage({ params }: Props) {
   if (!data) notFound();
 
   const { mp, mpVotes } = data;
-  const partyInfo = PARTIES[mp.party.trim()];
+  const partyInfo = PARTIES[normalizePartyAbbrev(mp.party)];
 
   // Stats
   const jaa = mpVotes.filter((v) => v.voteValue === "Jaa").length;

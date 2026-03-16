@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { billIdToSlug, formatFinnishDate } from "@/lib/utils";
 import { STAGES } from "@/lib/constants";
