@@ -27,7 +27,23 @@ export const PARTIES: Record<string, { name: string; color: string }> = {
   RKP:  { name: "RKP",              color: "#FFB81C" },
   KD:   { name: "KD",               color: "#18359B" },
   LIIK: { name: "Liike Nyt",        color: "#F05A28" },
+  // Swedish abbreviations (from API/initial-load data)
+  SAML: { name: "Kokoomus",         color: "#003580" },
+  SAF:  { name: "Perussuomalaiset", color: "#FFD700" },
+  SD:   { name: "SDP",              color: "#E0001A" },
+  CENT: { name: "Keskusta",         color: "#00A651" },
+  "GRÖNA": { name: "Vihreät",       color: "#61BF1A" },
+  VÄNST: { name: "Vasemmistoliitto",color: "#CC0033" },
+  SV:   { name: "RKP",              color: "#FFB81C" },
+  R:    { name: "RKP",              color: "#FFB81C" },
+  KRF:  { name: "KD",               color: "#18359B" },
+  ERK:  { name: "KD",               color: "#18359B" },
 };
+
+/** Trim trailing whitespace and normalize party key */
+export function normalizePartyKey(raw: string): string {
+  return raw.trim();
+}
 
 export const STAGES = [
   { key: "submitted",  label: "Annettu",       icon: "📋" },

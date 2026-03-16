@@ -31,7 +31,7 @@ export default function BillList({
         if (stage && b.currentStage !== stage) return false;
         if (category && b.category !== category) return false;
         if (q) {
-          const hay = [b.titleFi, b.id, ...b.keywords, b.sponsor, b.category]
+          const hay = [b.titleFi, b.id, ...b.keywords, b.sponsor, b.category, ...b.experts.map((e) => e.expertName)]
             .join(" ")
             .toLowerCase();
           if (!hay.includes(q)) return false;

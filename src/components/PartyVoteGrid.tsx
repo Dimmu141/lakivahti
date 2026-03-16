@@ -1,4 +1,4 @@
-import { PARTIES } from "@/lib/constants";
+import { PARTIES, normalizePartyKey } from "@/lib/constants";
 import type { SampleMpVote } from "@/lib/sample-data";
 
 interface PartyVoteGridProps {
@@ -19,11 +19,12 @@ export default function PartyVoteGrid({ mpVotes }: PartyVoteGridProps) {
   const byParty: Record<string, PartyBreakdown> = {};
 
   for (const v of mpVotes) {
-    if (!byParty[v.party]) {
-      const info = PARTIES[v.party];
-      byParty[v.party] = {
-        party: v.party,
-        name: info?.name ?? v.party,
+    const partyKey = normalizePartyKey(v.party);
+    if (!byParty[partyKey]) {
+      const info = PARTIES[partyKey];
+      byParty[partyKey] = {
+        party: partyKey,
+        name: info?.name ?? partyKey,
         color: info?.color ?? "#888",
         jaa: 0,
         ei: 0,
@@ -31,7 +32,7 @@ export default function PartyVoteGrid({ mpVotes }: PartyVoteGridProps) {
         tyhjaa: 0,
       };
     }
-    const rec = byParty[v.party];
+    const rec = byParty[partyKey];
     if (v.voteValue === "Jaa") rec.jaa++;
     else if (v.voteValue === "Ei") rec.ei++;
     else if (v.voteValue === "Poissa") rec.poissa++;

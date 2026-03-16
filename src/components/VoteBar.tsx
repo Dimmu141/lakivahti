@@ -66,6 +66,17 @@ export default function VoteBar({ vote }: { vote: SampleVote }) {
         <span>▪ Poissa {vote.votesAbsent}</span>
         {vote.votesEmpty > 0 && <span>▪ Tyhjää {vote.votesEmpty}</span>}
       </div>
+      <div className="mt-3 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <a
+          href={`https://verkkolahetys.eduskunta.fi/fi/taysistunto`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs hover:underline"
+          style={{ color: "var(--text-faint)" }}
+        >
+          📹 Katso täysistuntolähetys →
+        </a>
+      </div>
     </div>
   );
 }

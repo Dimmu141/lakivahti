@@ -16,18 +16,17 @@ import {
 
 /** Normalise party abbreviation to uppercase (API returns lowercase "sd" etc.) */
 function normaliseParty(raw: string): string {
+  const trimmed = raw.trim();
   const map: Record<string, string> = {
-    sd: "SDP",
-    kok: "KOK",
-    ps: "PS",
-    kesk: "KESK",
-    vihr: "VIHR",
-    vas: "VAS",
-    rkp: "RKP",
-    kd: "KD",
-    liik: "LIIK",
+    // Finnish lowercase
+    sd: "SDP", kok: "KOK", ps: "PS", kesk: "KESK",
+    vihr: "VIHR", vas: "VAS", rkp: "RKP", kd: "KD", liik: "LIIK",
+    // Swedish abbreviations
+    saml: "KOK", saf: "PS", cent: "KESK",
+    "gröna": "VIHR", vänst: "VAS", sv: "RKP", r: "RKP",
+    krf: "KD", erk: "KD",
   };
-  return map[raw.toLowerCase()] ?? raw.toUpperCase();
+  return map[trimmed.toLowerCase()] ?? trimmed.toUpperCase();
 }
 
 /**

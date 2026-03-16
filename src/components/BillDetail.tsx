@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import StageTracker from "./StageTracker";
 import VoteBar from "./VoteBar";
 import PartyVoteGrid from "./PartyVoteGrid";
@@ -227,12 +228,22 @@ export default function BillDetail({ bill }: { bill: SampleBill }) {
                       style={{ background: "var(--bg-inner)", border: "1px solid rgba(255,255,255,0.04)" }}
                     >
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-xs font-semibold" style={{ color: "var(--accent-red)" }}>
+                        <Link
+                          href={`/valiokunta/${c.committeeCode}`}
+                          className="font-mono text-xs font-semibold hover:underline"
+                          style={{ color: "var(--accent-red)" }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {c.committeeCode}
-                        </span>
-                        <span className="text-sm" style={{ color: "var(--text-primary)" }}>
+                        </Link>
+                        <Link
+                          href={`/valiokunta/${c.committeeCode}`}
+                          className="text-sm hover:underline"
+                          style={{ color: "var(--text-primary)" }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           {COMMITTEES[c.committeeCode] ?? c.committeeNameFi}
-                        </span>
+                        </Link>
                         <span
                           className="text-xs px-1.5 py-0.5 rounded"
                           style={{
@@ -298,8 +309,12 @@ export default function BillDetail({ bill }: { bill: SampleBill }) {
           <div>
             {bill.votes.length === 0 ? (
               <div className="text-center py-12" style={{ color: "var(--text-muted)" }}>
-                <div className="text-3xl mb-2">✅</div>
-                <p className="text-sm">Äänestystä ei vielä pidetty</p>
+                <div className="text-3xl mb-2">{bill.currentStage === "voted" || bill.currentStage === "enacted" ? "✅" : "🕐"}</div>
+                <p className="text-sm">
+                  {bill.currentStage === "voted" || bill.currentStage === "enacted"
+                    ? "Äänestys pidettiin — yksityiskohtaisia äänestystietoja ei ole saatavilla"
+                    : "Äänestystä ei vielä pidetty"}
+                </p>
               </div>
             ) : (
               <div className="space-y-5">

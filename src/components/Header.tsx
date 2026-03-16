@@ -40,6 +40,12 @@ export default function Header() {
           <Link href="/" className="hover:text-white transition-colors">
             Lakihankkeet
           </Link>
+          <Link href="/valiokunnat" className="hover:text-white transition-colors">
+            Valiokunnat
+          </Link>
+          <Link href="/kansanedustajat" className="hover:text-white transition-colors">
+            Kansanedustajat
+          </Link>
           <a
             href="https://avoindata.eduskunta.fi"
             target="_blank"
@@ -47,6 +53,13 @@ export default function Header() {
             className="hover:text-white transition-colors"
           >
             Lähdedata ↗
+          </a>
+          <a
+            href="/api/rss"
+            className="hover:text-white transition-colors"
+            title="RSS-syöte"
+          >
+            RSS
           </a>
         </nav>
       </div>

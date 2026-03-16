@@ -102,7 +102,7 @@ export async function getBills(query: BillsQuery = {}): Promise<BillsResult> {
       prisma.bill.count({ where }),
       prisma.bill.findMany({
         where,
-        include: { committees: true },
+        include: { committees: true, experts: true, votes: true },
         orderBy: [{ submittedDate: "desc" }, { id: "desc" }],
         skip: (page - 1) * limit,
         take: limit,
@@ -191,5 +191,90 @@ export async function getCategories(): Promise<string[]> {
     return rows.map((r) => r.category!).filter(Boolean);
   } catch {
     return [...new Set(SAMPLE_BILLS.map((b) => b.category))].sort();
+  }
+}
+
+/** Returns a single MP with their recent vote history. */
+export async function getMpWithVotes(mpId: string) {
+  try {
+    if (!prisma) throw new Error("no db");
+    const mp = await prisma.mp.findUnique({ where: { id: mpId } });
+    if (!mp) return null;
+    const mpVotes = await prisma.mpVote.findMany({
+      where: { mpId },
+      include: {
+        vote: {
+          include: {
+            bill: {
+              select: {
+                id: true,
+                titleFi: true,
+                currentStage: true,
+                submittedDate: true,
+                billType: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: [{ id: "desc" }],
+      take: 100,
+    });
+    return { mp, mpVotes };
+  } catch {
+    return null;
+  }
+}
+
+/** Returns all bills assigned to a committee. */
+export async function getBillsByCommittee(committeeCode: string): Promise<SampleBill[]> {
+  try {
+    if (!prisma) throw new Error("no db");
+    const assignments = await prisma.committeeAssignment.findMany({
+      where: { committeeCode },
+      include: {
+        bill: {
+          include: {
+            committees: true,
+            experts: true,
+            votes: true,
+            documents: true,
+          },
+        },
+      },
+      orderBy: [{ bill: { submittedDate: "desc" } }],
+    });
+    return assignments.map((a) => dbToSampleBill(a.bill));
+  } catch {
+    return [];
+  }
+}
+
+/** Returns recent bills with stage changes ordered by stageUpdatedAt. */
+export async function getRecentActivity(limit = 8): Promise<SampleBill[]> {
+  try {
+    if (!prisma) throw new Error("no db");
+    const bills = await prisma.bill.findMany({
+      where: { currentStage: { not: "submitted" } },
+      include: { committees: true, experts: true, votes: true },
+      orderBy: [{ stageUpdatedAt: "desc" }],
+      take: limit,
+    });
+    return bills.map(dbToSampleBill);
+  } catch {
+    return SAMPLE_BILLS.slice(0, limit);
+  }
+}
+
+/** Returns all active MPs. */
+export async function getMps() {
+  try {
+    if (!prisma) throw new Error("no db");
+    return await prisma.mp.findMany({
+      where: { isActive: true },
+      orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+    });
+  } catch {
+    return [];
   }
 }

@@ -16,7 +16,8 @@ interface BillSnapshot {
  *  KASVK                       → hearing
  *  VKPLM                       → report
  *  VKPP / 1K / 2K              → plenary
- *  EVEK / TOIMEVEK             → voted  (parliament voted, bill sent to president)
+ *  EVEK                        → voted  (parliament voted, bill sent to president)
+ *  TOIMEVEK                    → enacted (president signed, coming into force)
  */
 function stageFromCode(code: string): StageKey | null {
   if (["VIR", "ILM", "LK"].includes(code)) return "submitted";
@@ -24,7 +25,8 @@ function stageFromCode(code: string): StageKey | null {
   if (code === "KASVK") return "hearing";
   if (code === "VKPLM") return "report";
   if (["VKPP", "1K", "2K"].includes(code)) return "plenary";
-  if (["EVEK", "TOIMEVEK"].includes(code)) return "voted";
+  if (code === "EVEK") return "voted";
+  if (code === "TOIMEVEK") return "enacted";
   return null;
 }
 
