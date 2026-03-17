@@ -269,7 +269,7 @@ export async function syncBills(
                   publishedDate: parsed.submittedDate
                     ? new Date(parsed.submittedDate)
                     : null,
-                  eduskuntaUrl: `https://www.eduskunta.fi/FI/vaski/Mietinto/Sivut/${tunnus.replace(" vp", "").replace(/\s+/g, "_")}.aspx`,
+                  eduskuntaUrl: `https://www.eduskunta.fi/FI/vaski/Mietinto/Sivut/${tunnus.replace(" vp", "").replace(/\s+/g, "_").replace("/", "+")}.aspx`,
                 },
               });
 
