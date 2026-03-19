@@ -2,27 +2,10 @@ import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
 import Link from "next/link";
 import { getMpWithVotes } from "@/lib/bills-service";
-import { PARTIES } from "@/lib/constants";
+import { PARTIES, normalizePartyAbbrev } from "@/lib/constants";
 import { billIdToSlug, formatFinnishDate } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-
-const PARTY_GROUP_MAP: Record<string, string> = {
-  "Parliamentary Group of the National Coalition Party": "KOK",
-  "The Finns Party Parliamentary Group": "PS",
-  "Social Democratic Parliamentary Group": "SDP",
-  "Centre Party Parliamentary Group": "KESK",
-  "Green Parliamentary Group": "VIHR",
-  "Left Alliance Parliamentary Group": "VAS",
-  "Swedish Parliamentary Group": "RKP",
-  "Christian Democratic Parliamentary Group": "KD",
-  "Liike Nyt-Movement's Parliamentary Group": "LIIK",
-  "Parliamentary Group Timo Vornanen": "PS",
-};
-function normalizePartyAbbrev(raw: string): string {
-  const t = raw.trim();
-  return PARTY_GROUP_MAP[t] ?? t;
-}
 
 interface Props {
   params: Promise<{ id: string }>;

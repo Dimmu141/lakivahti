@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { SampleExpert } from "@/lib/sample-data";
 import { formatFinnishDate } from "@/lib/utils";
 
@@ -8,6 +11,9 @@ export default function ExpertCard({
   expert: SampleExpert;
   reportUrl?: string | null;
 }) {
+  const [expanded, setExpanded] = useState(false);
+  const hasSummary = !!expert.summaryFi;
+
   return (
     <div
       className="rounded-lg p-3"
@@ -16,8 +22,19 @@ export default function ExpertCard({
         border: "1px solid rgba(255,255,255,0.04)",
       }}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div>
+      <div
+        className="flex items-start justify-between gap-2 cursor-pointer"
+        onClick={() => hasSummary && setExpanded(!expanded)}
+        role={hasSummary ? "button" : undefined}
+        tabIndex={hasSummary ? 0 : undefined}
+        onKeyDown={(e) => {
+          if (hasSummary && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            setExpanded(!expanded);
+          }
+        }}
+      >
+        <div className="min-w-0">
           <div className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
             {expert.expertName}
           </div>
@@ -33,19 +50,73 @@ export default function ExpertCard({
               {formatFinnishDate(expert.hearingDate)}
             </span>
           )}
-          {reportUrl && (
-            <a
-              href={reportUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs hover:underline"
-              style={{ color: "var(--accent-green)" }}
+          {hasSummary && (
+            <span
+              className="text-xs transition-transform"
+              style={{
+                color: "var(--text-muted)",
+                transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
+              }}
             >
-              Katso mietintö →
-            </a>
+              ▼
+            </span>
           )}
         </div>
       </div>
+
+      {/* Expandable summary */}
+      {expanded && expert.summaryFi && (
+        <div
+          className="mt-2.5 pt-2.5 text-sm leading-relaxed"
+          style={{
+            borderTop: "1px solid rgba(255,255,255,0.06)",
+            color: "var(--text-secondary)",
+          }}
+        >
+          {expert.summaryFi}
+          <div className="flex gap-3 mt-2">
+            {expert.documentUrl && (
+              <a
+                href={expert.documentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs hover:underline"
+                style={{ color: "var(--accent-green)" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                Lausunto kokonaisuudessaan ↗
+              </a>
+            )}
+            {reportUrl && (
+              <a
+                href={reportUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs hover:underline"
+                style={{ color: "var(--accent-green)" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                Katso mietintö ↗
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Non-expandable: show report link inline */}
+      {!hasSummary && reportUrl && (
+        <div className="mt-2 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <a
+            href={reportUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs hover:underline"
+            style={{ color: "var(--accent-green)" }}
+          >
+            Katso mietintö ↗
+          </a>
+        </div>
+      )}
     </div>
   );
 }

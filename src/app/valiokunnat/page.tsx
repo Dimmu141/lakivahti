@@ -1,5 +1,5 @@
 import Header from "@/components/Header";
-import Link from "next/link";
+import CommitteeCard from "@/components/CommitteeCard";
 import { COMMITTEES } from "@/lib/constants";
 import { getPrisma } from "@/lib/db";
 
@@ -38,32 +38,12 @@ export default async function ValiokunnatPage() {
 
         <div className="grid grid-cols-1 gap-3">
           {entries.map(([code, name]) => (
-            <Link key={code} href={`/valiokunta/${code}`}>
-              <div
-                className="rounded-xl px-5 py-4 flex items-center justify-between transition-all cursor-pointer"
-                style={{
-                  background: "var(--bg-card)",
-                  border: "1px solid rgba(255,255,255,0.04)",
-                }}
-              >
-                <div className="flex items-center gap-4">
-                  <span className="font-mono text-sm font-bold w-12" style={{ color: "var(--accent-red)" }}>
-                    {code}
-                  </span>
-                  <span className="text-sm" style={{ color: "var(--text-primary)" }}>
-                    {name}
-                  </span>
-                </div>
-                {counts[code] !== undefined && (
-                  <span
-                    className="text-xs px-2.5 py-1 rounded-full"
-                    style={{ background: "rgba(255,255,255,0.06)", color: "var(--text-secondary)" }}
-                  >
-                    {counts[code]} hanketta
-                  </span>
-                )}
-              </div>
-            </Link>
+            <CommitteeCard
+              key={code}
+              code={code}
+              name={name}
+              count={counts[code]}
+            />
           ))}
         </div>
       </main>

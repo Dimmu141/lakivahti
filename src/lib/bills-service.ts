@@ -53,6 +53,9 @@ function dbToSampleBill(bill: any): SampleBill {
       expertOrganization: e.expertOrganization ?? null,
       hearingDate: e.hearingDate?.toISOString().split("T")[0] ?? null,
       committeeCode: e.committeeCode ?? null,
+      position: e.position ?? null,
+      summaryFi: e.summaryFi ?? null,
+      documentUrl: e.documentUrl ?? null,
     })),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     votes: (bill.votes ?? []).map((v: any) => ({
@@ -245,19 +248,62 @@ export async function getBillsByCommittee(committeeCode: string): Promise<Sample
   }
 }
 
-/** Returns recent bills with stage changes ordered by stageUpdatedAt. */
+/** Returns recent bills with stage changes — prioritises active processing stages
+ *  (plenary > report > hearing > committee) so the feed shows what is alive in
+ *  parliament right now, not just bulk-synced "enacted" records.
+ *  Only fetches committees (needed for display); skips experts/votes for speed. */
 export async function getRecentActivity(limit = 8): Promise<SampleBill[]> {
   try {
     if (!prisma) throw new Error("no db");
-    const bills = await prisma.bill.findMany({
-      where: { currentStage: { not: "submitted" } },
-      include: { committees: true, experts: true, votes: true },
+    const active = await prisma.bill.findMany({
+      where: { currentStage: { in: ["plenary", "report", "hearing", "committee"] } },
+      include: { committees: true },
       orderBy: [{ stageUpdatedAt: "desc" }],
       take: limit,
     });
-    return bills.map(dbToSampleBill);
+    if (active.length >= limit) {
+      return active.slice(0, limit).map((b) => dbToSampleBill({ ...b, experts: [], votes: [], documents: [] }));
+    }
+    // Pad with recently voted / enacted if not enough active bills
+    const extra = await prisma.bill.findMany({
+      where: { currentStage: { in: ["voted", "enacted"] } },
+      include: { committees: true },
+      orderBy: [{ stageUpdatedAt: "desc" }],
+      take: limit - active.length,
+    });
+    return [...active, ...extra].map((b) => dbToSampleBill({ ...b, experts: [], votes: [], documents: [] }));
   } catch {
     return SAMPLE_BILLS.slice(0, limit);
+  }
+}
+
+/** Returns bills that are closest to a vote — plenary stage first, then report.
+ *  Used for the "Tulossa äänestykseen" section on the homepage.
+ *  Only fetches committees (for committee code badge); skips experts/votes for speed. */
+export async function getUpcomingVotes(limit = 8): Promise<SampleBill[]> {
+  try {
+    if (!prisma) throw new Error("no db");
+    const [plenaryBills, reportBills] = await Promise.all([
+      prisma.bill.findMany({
+        where: { currentStage: "plenary" },
+        include: { committees: true },
+        orderBy: [{ stageUpdatedAt: "desc" }],
+      }),
+      prisma.bill.findMany({
+        where: { currentStage: "report" },
+        include: { committees: true },
+        orderBy: [{ stageUpdatedAt: "desc" }],
+        take: limit,
+      }),
+    ]);
+    // plenary bills always come first, then fill with report bills
+    return [...plenaryBills, ...reportBills]
+      .slice(0, limit)
+      .map((b) => dbToSampleBill({ ...b, experts: [], votes: [], documents: [] }));
+  } catch {
+    return SAMPLE_BILLS.filter((b) =>
+      b.currentStage === "plenary" || b.currentStage === "report"
+    ).slice(0, limit);
   }
 }
 

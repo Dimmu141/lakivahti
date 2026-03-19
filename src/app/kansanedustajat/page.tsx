@@ -1,37 +1,9 @@
 import Header from "@/components/Header";
 import Link from "next/link";
 import { getMps } from "@/lib/bills-service";
-import { PARTIES } from "@/lib/constants";
+import { PARTIES, PARTY_GROUP_MAP, normalizePartyAbbrev } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
-
-/** Map full English/Finnish party group names → abbreviation */
-const PARTY_GROUP_MAP: Record<string, string> = {
-  "Parliamentary Group of the National Coalition Party": "KOK",
-  "The Finns Party Parliamentary Group": "PS",
-  "Social Democratic Parliamentary Group": "SDP",
-  "Centre Party Parliamentary Group": "KESK",
-  "Green Parliamentary Group": "VIHR",
-  "Left Alliance Parliamentary Group": "VAS",
-  "Swedish Parliamentary Group": "RKP",
-  "Christian Democratic Parliamentary Group": "KD",
-  "Liike Nyt-Movement's Parliamentary Group": "LIIK",
-  "Parliamentary Group Timo Vornanen": "PS",
-  // Finnish names
-  "Kansallinen Kokoomus": "KOK",
-  "Perussuomalaiset": "PS",
-  "Suomen Sosialidemokraattinen Puolue": "SDP",
-  "Suomen Keskusta": "KESK",
-  "Vihreä liitto": "VIHR",
-  "Vasemmistoliitto": "VAS",
-  "Ruotsalainen kansanpuolue": "RKP",
-  "Kristillisdemokraatit": "KD",
-};
-
-function normalizePartyAbbrev(raw: string): string {
-  const trimmed = raw.trim();
-  return PARTY_GROUP_MAP[trimmed] ?? trimmed;
-}
 
 export default async function KansanedustajatPage() {
   const allMps = await getMps();

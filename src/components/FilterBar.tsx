@@ -4,10 +4,12 @@ interface FilterBarProps {
   query: string;
   stage: string;
   category: string;
+  billType: string;
   categories: string[];
   onQueryChange: (v: string) => void;
   onStageChange: (v: string) => void;
   onCategoryChange: (v: string) => void;
+  onBillTypeChange: (v: string) => void;
 }
 
 const STAGE_OPTIONS = [
@@ -19,6 +21,13 @@ const STAGE_OPTIONS = [
   { value: "plenary", label: "Täysistunto" },
   { value: "voted", label: "Äänestetty" },
   { value: "enacted", label: "Vahvistettu" },
+];
+
+const BILL_TYPE_OPTIONS = [
+  { value: "", label: "Kaikki tyypit" },
+  { value: "HE", label: "HE — Hallituksen esitys" },
+  { value: "LA", label: "LA — Lakialoite" },
+  { value: "KAA", label: "KAA — Kansalaisaloite" },
 ];
 
 const selectStyle: React.CSSProperties = {
@@ -42,14 +51,17 @@ export default function FilterBar({
   query,
   stage,
   category,
+  billType,
   categories,
   onQueryChange,
   onStageChange,
   onCategoryChange,
+  onBillTypeChange,
 }: FilterBarProps) {
   return (
-    <div className="flex flex-col sm:flex-row gap-2 mb-5">
-      <div className="relative flex-1">
+    <div className="flex flex-col gap-2 mb-5">
+      {/* Search — full width */}
+      <div className="relative">
         <span
           className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none"
           style={{ color: "var(--text-muted)" }}
@@ -58,7 +70,7 @@ export default function FilterBar({
         </span>
         <input
           type="text"
-          placeholder="Hae nimellä tai avainsanalla…"
+          placeholder="Hae nimellä, avainsanalla tai aloitteentekijällä…"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           className="w-full pl-9 pr-4 py-2 rounded-lg text-sm outline-none transition-all"
@@ -76,32 +88,47 @@ export default function FilterBar({
         />
       </div>
 
-      <select
-        value={stage}
-        onChange={(e) => onStageChange(e.target.value)}
-        style={selectStyle}
-      >
-        {STAGE_OPTIONS.map((o) => (
-          <option key={o.value} value={o.value} style={{ background: "#16162a" }}>
-            {o.label}
-          </option>
-        ))}
-      </select>
+      {/* Three dropdowns in a row */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        <select
+          value={billType}
+          onChange={(e) => onBillTypeChange(e.target.value)}
+          style={selectStyle}
+        >
+          {BILL_TYPE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value} style={{ background: "#16162a" }}>
+              {o.label}
+            </option>
+          ))}
+        </select>
 
-      <select
-        value={category}
-        onChange={(e) => onCategoryChange(e.target.value)}
-        style={selectStyle}
-      >
-        <option value="" style={{ background: "#16162a" }}>
-          Kaikki kategoriat
-        </option>
-        {categories.map((c) => (
-          <option key={c} value={c} style={{ background: "#16162a" }}>
-            {c}
+        <select
+          value={stage}
+          onChange={(e) => onStageChange(e.target.value)}
+          style={selectStyle}
+        >
+          {STAGE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value} style={{ background: "#16162a" }}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={category}
+          onChange={(e) => onCategoryChange(e.target.value)}
+          style={{ ...selectStyle, flex: 1 }}
+        >
+          <option value="" style={{ background: "#16162a" }}>
+            Kaikki kategoriat
           </option>
-        ))}
-      </select>
+          {categories.map((c) => (
+            <option key={c} value={c} style={{ background: "#16162a" }}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 }

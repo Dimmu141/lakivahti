@@ -10,8 +10,8 @@ export default function StageTracker({ currentStage }: StageTrackerProps) {
   const currentIndex = STAGE_KEYS.indexOf(currentStage as typeof STAGE_KEYS[number]);
 
   return (
-    <div className="w-full">
-      <div className="flex items-start">
+    <div className="w-full overflow-x-auto">
+      <div className="flex items-start min-w-[480px]">
         {STAGES.map((stage, i) => {
           const isPast = i < currentIndex;
           const isCurrent = i === currentIndex;
@@ -26,9 +26,10 @@ export default function StageTracker({ currentStage }: StageTrackerProps) {
                   style={{
                     left: "50%",
                     right: "-50%",
-                    background: isPast || isCurrent
-                      ? "linear-gradient(90deg, var(--accent-green), var(--accent-green))"
-                      : "rgba(255,255,255,0.08)",
+                    background:
+                      isPast || isCurrent
+                        ? "var(--accent-green)"
+                        : "rgba(255,255,255,0.08)",
                   }}
                 />
               )}

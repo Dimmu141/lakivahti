@@ -56,3 +56,33 @@ export const STAGES = [
 ] as const;
 
 export type StageKey = typeof STAGES[number]["key"];
+
+/** Current government coalition (Orpo cabinet, 2023–) */
+export const COALITION_PARTIES = new Set(["KOK", "PS", "RKP", "KD"]);
+
+/** Maps full party group names (from API) to their short abbreviations */
+export const PARTY_GROUP_MAP: Record<string, string> = {
+  "Parliamentary Group of the National Coalition Party": "KOK",
+  "The Finns Party Parliamentary Group": "PS",
+  "Social Democratic Parliamentary Group": "SDP",
+  "Centre Party Parliamentary Group": "KESK",
+  "Green Parliamentary Group": "VIHR",
+  "Left Alliance Parliamentary Group": "VAS",
+  "Swedish Parliamentary Group": "RKP",
+  "Christian Democratic Parliamentary Group": "KD",
+  "Liike Nyt-Movement's Parliamentary Group": "LIIK",
+  "Parliamentary Group Timo Vornanen": "PS",
+  // Finnish names
+  "Kansallinen Kokoomus": "KOK",
+  "Perussuomalaiset": "PS",
+  "Suomen Sosialidemokraattinen Puolue": "SDP",
+  "Suomen Keskusta": "KESK",
+  "Vihreä liitto": "VIHR",
+  "Vasemmistoliitto": "VAS",
+  "Ruotsalainen kansanpuolue": "RKP",
+  "Kristillisdemokraatit": "KD",
+};
+
+export function normalizePartyAbbrev(raw: string): string {
+  return PARTY_GROUP_MAP[raw.trim()] ?? raw.trim();
+}

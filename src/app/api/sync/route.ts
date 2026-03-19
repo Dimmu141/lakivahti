@@ -5,8 +5,12 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300; // 5 min — Vercel Pro only; remove for free tier
 
 export async function POST(req: NextRequest) {
+  const syncKey = process.env.SYNC_API_KEY;
+  if (!syncKey || syncKey === "change-me-to-a-random-secret") {
+    return NextResponse.json({ error: "SYNC_API_KEY not configured" }, { status: 503 });
+  }
   const key = req.headers.get("x-sync-key");
-  if (!key || key !== process.env.SYNC_API_KEY) {
+  if (!key || key !== syncKey) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -22,9 +26,12 @@ export async function POST(req: NextRequest) {
 /** GET version for Vercel cron (cron jobs use GET) */
 export async function GET(req: NextRequest) {
   // Vercel cron sends Authorization: Bearer <CRON_SECRET>
-  const auth = req.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && auth !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || cronSecret === "change-me-to-a-random-secret") {
+    return NextResponse.json({ error: "CRON_SECRET not configured" }, { status: 503 });
+  }
+  const auth = req.headers.get("authorization");
+  if (auth !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

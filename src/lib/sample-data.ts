@@ -4,6 +4,9 @@ export interface SampleExpert {
   expertOrganization: string | null;
   hearingDate: string | null;
   committeeCode: string | null;
+  position: string | null;
+  summaryFi: string | null;
+  documentUrl: string | null;
 }
 
 export interface SampleCommittee {
@@ -100,6 +103,9 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertOrganization: "Puolustusvoimat",
         hearingDate: "2026-02-05",
         committeeCode: "PuV",
+        position: "puolesta",
+        summaryFi: "Kertausharjoitusten pidentäminen on välttämätöntä reservin suorituskyvyn ylläpitämiseksi muuttuneessa turvallisuusympäristössä.",
+        documentUrl: null,
       },
       {
         id: 2,
@@ -107,6 +113,9 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertOrganization: "Maanpuolustuskorkeakoulu",
         hearingDate: "2026-02-05",
         committeeCode: "PuV",
+        position: "puolesta",
+        summaryFi: "Tutkimuksen mukaan reservin koulutustason nostaminen edellyttää pidempää kertausharjoituskiertoa.",
+        documentUrl: null,
       },
       {
         id: 3,
@@ -114,6 +123,9 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertOrganization: "Suomen Sadankomitea",
         hearingDate: "2026-02-07",
         committeeCode: "PuV",
+        position: "vastaan",
+        summaryFi: "Esitys kaventaa kansalaisten perusoikeuksia kohtuuttomasti suhteessa saavutettavaan puolustushyötyyn.",
+        documentUrl: null,
       },
     ],
     votes: [
@@ -186,6 +198,9 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertOrganization: "STM",
         hearingDate: "2026-02-10",
         committeeCode: "StV",
+        position: "puolesta",
+        summaryFi: "Uudistus on välttämätön hoitojonojen lyhentämiseksi ja palveluiden yhdenvertaisuuden turvaamiseksi.",
+        documentUrl: null,
       },
       {
         id: 5,
@@ -193,6 +208,9 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertOrganization: "Tampereen yliopisto",
         hearingDate: "2026-02-10",
         committeeCode: "StV",
+        position: "neutraali",
+        summaryFi: "Uudistuksen tavoitteet ovat kannatettavia, mutta rahoituspohjan riittävyys herättää huolta.",
+        documentUrl: null,
       },
     ],
     votes: [],
@@ -245,6 +263,9 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertOrganization: "Verohallinto",
         hearingDate: "2026-03-05",
         committeeCode: "VaV",
+        position: "neutraali",
+        summaryFi: null,
+        documentUrl: null,
       },
       {
         id: 7,
@@ -252,6 +273,9 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertOrganization: "Kotityöpalveluyhdistys",
         hearingDate: "2026-03-05",
         committeeCode: "VaV",
+        position: "puolesta",
+        summaryFi: "Kotitalousvähennyksen korotus tukee alan kasvua ja vähentää harmaata taloutta.",
+        documentUrl: null,
       },
     ],
     votes: [],
@@ -363,6 +387,9 @@ export const SAMPLE_BILLS: SampleBill[] = [
         expertOrganization: "Ympäristöministeriö",
         hearingDate: "2025-10-15",
         committeeCode: "YmV",
+        position: "puolesta",
+        summaryFi: null,
+        documentUrl: null,
       },
     ],
     votes: [
