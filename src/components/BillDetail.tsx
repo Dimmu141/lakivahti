@@ -251,13 +251,13 @@ export default function BillDetail({ bill }: { bill: SampleBill }) {
       {/* Tabs */}
       <div
         className="flex gap-1 mb-4 p-1 rounded-xl overflow-x-auto"
-        style={{ background: "var(--bg-card)", border: "1px solid rgba(255,255,255,0.04)" }}
+        style={{ background: "var(--bg-card)", border: "1px solid rgba(255,255,255,0.04)", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}
       >
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className="flex-1 py-2 px-3 text-sm rounded-lg transition-all shrink-0"
+            className="flex-1 py-2 px-3 text-sm rounded-lg transition-all shrink-0 whitespace-nowrap min-w-0"
             style={{
               background: activeTab === tab.key ? "var(--bg-inner)" : "transparent",
               color: activeTab === tab.key ? "var(--text-primary)" : "var(--text-muted)",

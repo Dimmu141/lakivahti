@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Link from "next/link";
+import Image from "next/image";
 import { getMps } from "@/lib/bills-service";
 import { PARTIES, PARTY_GROUP_MAP, normalizePartyAbbrev } from "@/lib/constants";
 
@@ -77,10 +78,12 @@ export default async function KansanedustajatPage() {
                           }}
                         >
                           {mp.photoUrl ? (
-                            <img
+                            <Image
                               src={mp.photoUrl}
                               alt={`${mp.firstName} ${mp.lastName}`}
-                              className="w-8 h-8 rounded-full object-cover shrink-0"
+                              width={32}
+                              height={32}
+                              className="rounded-full object-cover shrink-0"
                             />
                           ) : (
                             <div

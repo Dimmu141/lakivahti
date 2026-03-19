@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   description:
     "Seuraa hallituksen esitysten ja lakialoitteiden etenemistä eduskunnan käsittelyssä. Avoin data, reaaliaikainen seuranta.",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://lakivahti.fi"
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://lakivahti.vercel.app"
   ),
   openGraph: {
     siteName: "Lakivahti",
@@ -27,7 +28,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fi">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

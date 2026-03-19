@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import BackButton from "@/components/BackButton";
 import Link from "next/link";
+import Image from "next/image";
 import { getMpWithVotes } from "@/lib/bills-service";
 import { PARTIES, normalizePartyAbbrev } from "@/lib/constants";
 import { billIdToSlug, formatFinnishDate } from "@/lib/utils";
@@ -59,10 +60,12 @@ export default async function KansanedustajaPage({ params }: Props) {
         >
           <div className="flex items-start gap-5">
             {mp.photoUrl ? (
-              <img
+              <Image
                 src={mp.photoUrl}
                 alt={`${mp.firstName} ${mp.lastName}`}
-                className="w-20 h-20 rounded-xl object-cover shrink-0"
+                width={80}
+                height={80}
+                className="rounded-xl object-cover shrink-0"
               />
             ) : (
               <div
