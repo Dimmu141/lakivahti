@@ -62,13 +62,16 @@ export default function FilterBar({
     <div className="flex flex-col gap-2 mb-5">
       {/* Search — full width */}
       <div className="relative">
+        <label htmlFor="bill-search" className="sr-only">Hae lakihankkeita</label>
         <span
           className="absolute left-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none"
           style={{ color: "var(--text-muted)" }}
+          aria-hidden="true"
         >
           🔍
         </span>
         <input
+          id="bill-search"
           type="text"
           placeholder="Hae nimellä, avainsanalla tai aloitteentekijällä…"
           value={query}
@@ -94,6 +97,7 @@ export default function FilterBar({
           value={billType}
           onChange={(e) => onBillTypeChange(e.target.value)}
           style={selectStyle}
+          aria-label="Suodata lakityypin mukaan"
         >
           {BILL_TYPE_OPTIONS.map((o) => (
             <option key={o.value} value={o.value} style={{ background: "#16162a" }}>
@@ -106,6 +110,7 @@ export default function FilterBar({
           value={stage}
           onChange={(e) => onStageChange(e.target.value)}
           style={selectStyle}
+          aria-label="Suodata käsittelyvaiheen mukaan"
         >
           {STAGE_OPTIONS.map((o) => (
             <option key={o.value} value={o.value} style={{ background: "#16162a" }}>
@@ -118,6 +123,7 @@ export default function FilterBar({
           value={category}
           onChange={(e) => onCategoryChange(e.target.value)}
           style={{ ...selectStyle, flex: 1 }}
+          aria-label="Suodata kategorian mukaan"
         >
           <option value="" style={{ background: "#16162a" }}>
             Kaikki kategoriat

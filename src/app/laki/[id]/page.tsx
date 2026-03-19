@@ -37,8 +37,29 @@ export default async function BillPage({ params }: Props) {
   const bill = await getBillById(slugToBillId(id));
   if (!bill) notFound();
 
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lakivahti.vercel.app";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Legislation",
+    name: bill.titleFi,
+    identifier: bill.id,
+    url: `${base}/laki/${billIdToSlug(bill.id)}`,
+    dateCreated: bill.submittedDate,
+    ...(bill.summaryFi && { description: bill.summaryFi }),
+    ...(bill.keywords.length > 0 && { keywords: bill.keywords.join(", ") }),
+    legislationPassedBy: {
+      "@type": "Organization",
+      name: "Suomen eduskunta",
+      url: "https://eduskunta.fi",
+    },
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Header />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-5">
         <BackButton />

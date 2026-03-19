@@ -132,6 +132,8 @@ export default function BillList({
               <button
                 key={o.key}
                 onClick={() => setSortMode(o.key)}
+                aria-label={`Järjestä: ${o.label}`}
+                aria-pressed={sortMode === o.key}
                 className="px-2.5 py-1 transition-colors"
                 style={{
                   background: sortMode === o.key ? "rgba(233,69,96,0.2)" : "var(--bg-card)",
