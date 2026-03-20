@@ -54,6 +54,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Gov project card hover */
+.gov-project-card {
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: border-color 0.15s ease;
+}
+.gov-project-card:hover {
+  border-color: rgba(78, 204, 163, 0.2);
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

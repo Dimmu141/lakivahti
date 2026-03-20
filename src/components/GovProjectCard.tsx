@@ -1,5 +1,3 @@
-"use client";
-
 import type { GovProject } from "@/lib/gov-projects-service";
 import { PREP_PHASE_LABELS, PREP_PHASE_COLORS } from "@/lib/gov-projects-service";
 
@@ -22,18 +20,11 @@ export default function GovProjectCard({ project }: { project: GovProject }) {
       href={project.hankeikkunaUrl ?? "#"}
       target="_blank"
       rel="noopener noreferrer"
-      className="block rounded-xl p-4 mb-3 transition-all"
+      className="gov-project-card block rounded-xl p-4 mb-3"
       style={{
         background: "var(--bg-card)",
-        border: "1px solid rgba(255,255,255,0.04)",
         textDecoration: "none",
       }}
-      onMouseEnter={(e) =>
-        ((e.currentTarget as HTMLElement).style.borderColor = "rgba(78,204,163,0.2)")
-      }
-      onMouseLeave={(e) =>
-        ((e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.04)")
-      }
     >
       {/* Top row */}
       <div className="flex items-start justify-between gap-3 mb-2">
