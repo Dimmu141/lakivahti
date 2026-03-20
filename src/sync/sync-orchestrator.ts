@@ -1,7 +1,8 @@
 /**
  * Main sync orchestrator — called by /api/sync and the cron job.
  *
- * Runs: MPs → Bills → Votes → Government Projects (in that order).
+ * Runs: MPs → Bills → Votes (in that order so FK constraints are satisfied).
+ * Government projects are synced separately via skipGovProjects flag.
  */
 
 import dotenv from "dotenv";
@@ -30,6 +31,8 @@ export async function runSync(options: {
   year?: number;
   skipMps?: boolean;
   incremental?: boolean;
+  /** Include government project sync (slow — skip in daily cron) */
+  includeGovProjects?: boolean;
 } = {}): Promise<SyncResult> {
   const currentYear = new Date().getFullYear();
   const years = options.year
@@ -65,9 +68,12 @@ export async function runSync(options: {
     console.log("[sync] Recalculating stages...");
     await recalculateStages();
 
-    // Sync government projects from Hankeikkuna (independent of year)
-    console.log("[sync] Syncing government projects...");
-    const govProjects = await syncGovernmentProjects();
+    // Government projects sync is optional — too slow for daily cron
+    let govProjects: { upserted: number; errors: number } | undefined;
+    if (options.includeGovProjects) {
+      console.log("[sync] Syncing government projects...");
+      govProjects = await syncGovernmentProjects();
+    }
 
     console.log("[sync] Complete.");
     return { ok: true, timestamp, years, mps, bills: totalBills, votes: totalVotes, govProjects };
@@ -80,7 +86,7 @@ export async function runSync(options: {
 
 // Entry point when run directly via `npm run sync`
 if (process.argv[1] && process.argv[1].includes("sync-orchestrator")) {
-  runSync().then((result) => {
+  runSync({ includeGovProjects: true }).then((result) => {
     console.log("[sync] Result:", JSON.stringify(result, null, 2));
     process.exit(result.ok ? 0 : 1);
   });
