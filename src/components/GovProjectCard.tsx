@@ -83,6 +83,29 @@ export default function GovProjectCard({ project }: { project: GovProject }) {
         </p>
       )}
 
+      {/* Keywords */}
+      {project.keywords.length > 0 && (
+        <div className="flex gap-1.5 flex-wrap mb-3">
+          {project.keywords.slice(0, 5).map((kw) => (
+            <span
+              key={kw}
+              className="text-xs px-1.5 py-0.5 rounded"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                color: "var(--text-faint)",
+              }}
+            >
+              {kw}
+            </span>
+          ))}
+          {project.keywords.length > 5 && (
+            <span className="text-xs" style={{ color: "var(--text-faint)" }}>
+              +{project.keywords.length - 5}
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Footer */}
       <div className="flex items-center justify-between gap-2 flex-wrap text-xs" style={{ color: "var(--text-muted)" }}>
         <div className="flex items-center gap-3 flex-wrap">
@@ -91,6 +114,14 @@ export default function GovProjectCard({ project }: { project: GovProject }) {
             <>
               <span>·</span>
               <span>{project.responsibleMinister}</span>
+            </>
+          )}
+          {project.startDate && (
+            <>
+              <span>·</span>
+              <span style={{ color: "var(--text-faint)" }}>
+                Aloitettu {formatDate(project.startDate)}
+              </span>
             </>
           )}
         </div>

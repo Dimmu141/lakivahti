@@ -312,6 +312,17 @@ export default async function HomePage() {
         )}
 
         {/* ── Full filterable list ── */}
+        <div className="mb-4 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          <h2
+            className="text-xs uppercase tracking-widest font-semibold mb-1"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Kaikki lakihankkeet
+          </h2>
+          <p className="text-xs" style={{ color: "var(--text-faint)" }}>
+            Hae, suodata ja selaa kaikkia eduskunnan käsittelyssä olevia hankkeita
+          </p>
+        </div>
         <BillList
           initialBills={bills}
           initialStageCounts={stageCounts}
