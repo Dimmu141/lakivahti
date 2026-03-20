@@ -35,6 +35,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const result = await runSync({ incremental: true, skipMps: true });
+  // Only sync current year to stay within Vercel's time limits
+  const currentYear = new Date().getFullYear();
+  const result = await runSync({ year: currentYear, incremental: true, skipMps: true });
   return NextResponse.json(result, { status: result.ok ? 200 : 500 });
 }

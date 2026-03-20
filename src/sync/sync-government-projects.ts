@@ -73,6 +73,7 @@ async function fetchPage(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(20000), // 20s timeout per page
   });
 
   if (!res.ok) {
@@ -183,8 +184,8 @@ export async function syncGovernmentProjects(): Promise<{
     // Stop if no more results
     if (!cursor || results.length === 0) break;
 
-    // Safety cap: max 20 pages (2000 projects) per sync
-    if (page >= 20) {
+    // Safety cap: max 5 pages (500 projects) per sync to avoid timeouts
+    if (page >= 5) {
       console.log("[gov-sync] Page cap reached, stopping.");
       break;
     }
