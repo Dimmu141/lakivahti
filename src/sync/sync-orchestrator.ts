@@ -1,7 +1,7 @@
 /**
  * Main sync orchestrator — called by /api/sync and the cron job.
  *
- * Runs: MPs → Bills → Votes (in that order so FK constraints are satisfied).
+ * Runs: MPs → Bills → Votes → Government Projects (in that order).
  */
 
 import dotenv from "dotenv";
@@ -9,6 +9,7 @@ dotenv.config({ path: ".env.local" });
 import { syncMps } from "./sync-mps";
 import { syncBills, recalculateStages } from "./sync-bills";
 import { syncVotes } from "./sync-votes";
+import { syncGovernmentProjects } from "./sync-government-projects";
 
 /** Earliest parliamentary year to fetch data for. */
 export const SYNC_START_YEAR = 2024;
@@ -20,6 +21,7 @@ export interface SyncResult {
   mps?: { upserted: number; errors: number };
   bills?: { upserted: number; committeesUpdated: number; errors: number };
   votes?: { upserted: number; mpVotes: number; errors: number };
+  govProjects?: { upserted: number; errors: number };
   error?: string;
 }
 
@@ -63,8 +65,12 @@ export async function runSync(options: {
     console.log("[sync] Recalculating stages...");
     await recalculateStages();
 
+    // Sync government projects from Hankeikkuna (independent of year)
+    console.log("[sync] Syncing government projects...");
+    const govProjects = await syncGovernmentProjects();
+
     console.log("[sync] Complete.");
-    return { ok: true, timestamp, years, mps, bills: totalBills, votes: totalVotes };
+    return { ok: true, timestamp, years, mps, bills: totalBills, votes: totalVotes, govProjects };
   } catch (e) {
     const error = e instanceof Error ? e.message : String(e);
     console.error("[sync] Failed:", error);
