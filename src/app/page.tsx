@@ -9,19 +9,21 @@ import {
   getRecentActivity,
   getUpcomingVotes,
 } from "@/lib/bills-service";
+import { getRecentGovProjects, PREP_PHASE_LABELS } from "@/lib/gov-projects-service";
 import { STAGES } from "@/lib/constants";
 import { billIdToSlug, formatFinnishDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [{ bills, total }, stageCounts, categories, recentActivity, upcomingVotes] =
+  const [{ bills, total }, stageCounts, categories, recentActivity, upcomingVotes, recentGovProjects] =
     await Promise.all([
       getBills({ limit: 200 }),
       getStageCounts(),
       getCategories(),
       getRecentActivity(8),
       getUpcomingVotes(8),
+      getRecentGovProjects(5),
     ]);
 
   return (
@@ -215,6 +217,94 @@ export default async function HomePage() {
                       {formatFinnishDate(bill.stageUpdatedAt)}
                     </span>
                   </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── Valmistelussa ── */}
+        {recentGovProjects.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <h2
+                  className="text-xs uppercase tracking-widest font-semibold"
+                  style={{ color: "var(--accent-green)" }}
+                >
+                  Valmistelussa
+                </h2>
+                <span className="text-xs" style={{ color: "var(--text-faint)" }}>
+                  — ministeriöissä
+                </span>
+              </div>
+              <Link
+                href="/hankkeet"
+                className="text-xs hover:underline"
+                style={{ color: "var(--accent-green)" }}
+              >
+                Kaikki hankkeet →
+              </Link>
+            </div>
+            <div
+              className="rounded-2xl overflow-hidden"
+              style={{
+                background: "var(--bg-card)",
+                border: "1px solid rgba(78,204,163,0.08)",
+              }}
+            >
+              {recentGovProjects.map((proj, i) => {
+                const phaseLabel = proj.prepPhase
+                  ? (PREP_PHASE_LABELS[proj.prepPhase] ?? proj.prepPhase)
+                  : "Valmistelussa";
+                return (
+                  <a
+                    key={proj.uuid}
+                    href={proj.hankeikkunaUrl ?? "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors"
+                    style={{
+                      borderBottom:
+                        i < recentGovProjects.length - 1
+                          ? "1px solid rgba(255,255,255,0.04)"
+                          : undefined,
+                      textDecoration: "none",
+                    }}
+                  >
+                    <span
+                      className="text-xs px-1.5 py-0.5 rounded shrink-0"
+                      style={{
+                        background: "rgba(78,204,163,0.1)",
+                        color: "var(--accent-green)",
+                        minWidth: "110px",
+                        textAlign: "center",
+                      }}
+                    >
+                      {phaseLabel}
+                    </span>
+                    <span
+                      className="text-xs font-mono shrink-0 hidden sm:inline"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      {proj.tunnus}
+                    </span>
+                    <span
+                      className="text-xs flex-1 truncate"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {proj.aliasFi ?? proj.nameFi}
+                    </span>
+                    {proj.ministry && (
+                      <span
+                        className="text-xs shrink-0 hidden md:inline"
+                        style={{ color: "var(--text-faint)" }}
+                      >
+                        {proj.ministry.replace("ministeriö", "min.").replace("Ministeriö", "Min.")}
+                      </span>
+                    )}
+                    <span style={{ color: "var(--accent-green)", opacity: 0.5, fontSize: "10px" }}>↗</span>
+                  </a>
                 );
               })}
             </div>

@@ -6,6 +6,7 @@ import { useState } from "react";
 
 const NAV_LINKS = [
   { href: "/", label: "Lakihankkeet" },
+  { href: "/hankkeet", label: "Valmistelussa" },
   { href: "/valiokunnat", label: "Valiokunnat" },
   { href: "/kansanedustajat", label: "Kansanedustajat" },
 ];

@@ -51,6 +51,9 @@ export default function Footer() {
             <Link href="/" className="hover:text-white transition-colors">
               Lakihankkeet
             </Link>
+            <Link href="/hankkeet" className="hover:text-white transition-colors">
+              Valmistelussa
+            </Link>
             <Link href="/valiokunnat" className="hover:text-white transition-colors">
               Valiokunnat
             </Link>
