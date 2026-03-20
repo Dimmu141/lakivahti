@@ -16,9 +16,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
-    "@types/better-sqlite3": "^7.6.13",
     "@vercel/analytics": "^2.0.1",
-    "better-sqlite3": "^12.8.0",
     "dotenv": "^17.3.1",
     "fast-xml-parser": "^5.5.5",
     "next": "16.1.6",
@@ -29,10 +27,12 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/pg": "^8.18.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "better-sqlite3": "^12.8.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"

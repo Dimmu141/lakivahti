@@ -57,6 +57,9 @@ export default function Footer() {
             <Link href="/kansanedustajat" className="hover:text-white transition-colors">
               Kansanedustajat
             </Link>
+            <Link href="/tietosuoja" className="hover:text-white transition-colors">
+              Tietosuoja
+            </Link>
             <a
               href="/api/rss"
               className="hover:text-white transition-colors flex items-center gap-1"

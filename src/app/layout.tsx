@@ -24,6 +24,24 @@ export const metadata: Metadata = {
     siteName: "Lakivahti",
     locale: "fi_FI",
     type: "website",
+    title: "Lakivahti — Suomen lainsäädännön seuranta",
+    description:
+      "Seuraa hallituksen esitysten ja lakialoitteiden etenemistä eduskunnan käsittelyssä. Avoin data, reaaliaikainen seuranta.",
+    images: [
+      {
+        url: "/og-image.svg",
+        width: 1200,
+        height: 630,
+        alt: "Lakivahti — Suomen lainsäädännön seuranta",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Lakivahti — Suomen lainsäädännön seuranta",
+    description:
+      "Seuraa hallituksen esitysten ja lakialoitteiden etenemistä eduskunnan käsittelyssä.",
+    images: ["/og-image.svg"],
   },
   robots: {
     index: true,
