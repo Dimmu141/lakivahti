@@ -1,4 +1,5 @@
-import Link from "next/link";
+"use client";
+
 import type { GovProject } from "@/lib/gov-projects-service";
 import { PREP_PHASE_LABELS, PREP_PHASE_COLORS } from "@/lib/gov-projects-service";
 
